@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:tls="http://www.mulesoft.org/schema/mule/tls" xmlns:email="http://www.mulesoft.org/schema/mule/email"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/email http://www.mulesoft.org/schema/mule/email/current/mule-email.xsd
+http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd">
+	<flow name="getPersonByID" doc:id="37a98df3-924b-4ac0-a54b-2fd67d7ca34b" >
+		<set-variable value="#[attributes.uriParams.id]" doc:name="id" doc:id="e528ac3c-a5db-4784-9a81-65395883e6d9" variableName="id"/>
+		<db:select doc:name="Select" doc:id="9d3f5f4f-de14-494a-a257-6ddeb1f59f4b" config-ref="Database_Config">
+			<db:sql ><![CDATA[select left_days from covid.person_in_isolation where id = :id]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{
+	'id' : vars.id
+}]]]></db:input-parameters>
+		</db:select>
+		<set-payload value="#[payload[0].left_days]" doc:name="Set Payload" doc:id="21f76156-6e12-4c47-90bd-1ebd5bf0ea08" />
+		<ee:transform doc:name="Transform Message" doc:id="da7b9954-e922-46ba-8cac-fe50d391c95f" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+[{
+	left_days: payload as String,
+	for_user: vars.id as String
+}]]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="getPersonByType" doc:id="1f24555e-0d45-443b-b5eb-ea976ba857da">
+		<set-variable value="#[attributes.queryParams.isolation_type]" doc:name="isolation_type" doc:id="082e9674-0cd6-4e4b-ba18-686a116ccd34" variableName="isolation_type"/>
+		<db:select doc:name="Select by type" doc:id="d136fa2d-07fb-4a3d-a72b-3340cb1f94cb" config-ref="Database_Config">
+			<db:sql><![CDATA[select * from covid.person_in_isolation
+where isolation_status= :isolation_tipe]]></db:sql>
+			<db:input-parameters><![CDATA[#[{'isolation_tipe': vars.isolation_type}]]]></db:input-parameters>
+		</db:select>
+		<choice doc:name="Choice" doc:id="15dc1cb5-0459-479d-9990-cbfee1b6d6f0" >
+			<when expression='#[vars.isolation_type=="14" or vars.isolation_type=="28"]'>
+				<choice doc:name="Choice" doc:id="0f7167a0-bf9e-4bba-9771-96850dd5161b" >
+					<when expression="#[sizeOf(payload) != 0]">
+						<ee:transform doc:name="Transform Message" doc:id="72716992-56b5-4b61-922e-1097b463cd90">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload map ( payload01 , indexOfPayload01 ) -> {
+	id: payload01.id as Number,
+	name: payload01.name,
+	surname: payload01.surname,
+	citizenship: payload01.citizenship,
+	statefrom: payload01.statefrom,
+	symptoms: payload01.symptoms
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+					</when>
+					<otherwise>
+						<set-variable value="404" doc:name="httpStatus" doc:id="ae0e490e-982e-4a17-bfd0-d4958d77c82d" variableName="httpStatus" />
+						<raise-error doc:name="Raise error" doc:id="68fa4868-9233-44ae-9bba-e5725334b3eb" type="CUSTOM:CUSTOM_ERROR" description='"Data source is empty"'/>
+					</otherwise>
+				</choice>
+			</when>
+			<otherwise>
+				<set-variable value="400" doc:name="httpStatus" doc:id="51ee02d6-05d5-4c27-ba96-83e0929eced7" variableName="httpStatus" />
+				<raise-error doc:name="Raise error" doc:id="8326bcd1-ad3d-4dd9-a4f7-58253458b8a4" type="CUSTOM:CUSTOM_ERROR" description='"Input is wrong for isolation status"'/>
+			</otherwise>
+		</choice>
+	</flow>
+	<flow name="postPerson" doc:id="e3957ce4-f444-43dc-92f4-193bb6e3fc03" >
+		<set-variable value="#[payload.citizenship]" doc:name="citizenship" doc:id="241b81e5-f67f-456f-8b8b-5594aaec4142" variableName="citizenship"/>
+		<set-variable value="#[payload.symptoms]" doc:name="symptoms" doc:id="df432dae-5354-466d-9d38-a608445e5832" variableName="symptoms"/>
+		<set-variable value="#[payload.statefrom]" doc:name="statefrom" doc:id="462f3c0e-02b8-44d2-82a4-3e4efeeeede0" variableName="statefrom"/>
+		<set-variable value="#[payload.id]" doc:name="ID" doc:id="0276565c-f68f-45ae-86a1-032f3f55519e" variableName="ID" />
+		<choice doc:name="Choice" doc:id="ed9a5813-ad5f-480d-9340-6f73b1adffd9" >
+			<when expression="#[vars.citizenship == &quot;Serbia&quot; and lower(vars.symptoms)=='yes']">
+				<db:insert doc:name="Insert into hospital" doc:id="7f4d7e28-5270-436f-80c3-8000e7a30d25" config-ref="Database_Config">
+			<db:sql><![CDATA[INSERT INTO covid.person_in_hospital(id, name, surname, citizenship, statefrom, symptoms, hospital)
+VALUES (:id, :name, :surname, :citizenship, :statefrom, :symptoms, :hospital)]]></db:sql>
+			<db:input-parameters><![CDATA[#[{	'id': payload.id,
+	'name': payload.name,
+	'surname': payload.surname,
+	'citizenship': payload.citizenship,
+	'statefrom': payload.statefrom,
+	'symptoms': payload.symptoms,
+	'hospital': 'Neka bolnica'
+}]]]></db:input-parameters>
+		</db:insert>
+				<db:select doc:name="Select hospital" doc:id="75e72e6d-aaa9-4e59-a8fc-2c19701f617e" config-ref="Database_Config">
+			<db:sql><![CDATA[select id, name from covid.hospital order by empty_space desc limit 1;]]></db:sql>
+		</db:select>
+				<set-variable doc:name="hospital" doc:id="73768746-b221-4191-b779-3b19a2185eb5" variableName="hospital" value="#[payload[0].name]" />
+				<db:update doc:name="Update hospital name" doc:id="d1a45e67-4727-46bb-85ce-9a4b524c8c32" config-ref="Database_Config">
+			<db:sql><![CDATA[update covid.person_in_hospital set hospital= :hospital where id= :id]]></db:sql>
+			<db:input-parameters><![CDATA[#[{
+	'hospital' : vars.hospital,
+	'id' : vars.ID
+	}]]]></db:input-parameters>
+		</db:update>
+				<db:update doc:name="Update empty_space" doc:id="51252858-68b7-4aae-b4b2-641c599e76bf" config-ref="Database_Config">
+			<db:sql><![CDATA[update covid.hospital set empty_space= empty_space -1 where name= :hospital]]></db:sql>
+			<db:input-parameters><![CDATA[#[{
+	'hospital' : vars.hospital
+}]]]></db:input-parameters>
+		</db:update>
+				<set-payload value="#['Person is in the hospital']" doc:name="In hospital" doc:id="919b2811-f9db-45b9-9ad5-313bae7091f5" />
+			</when>
+			<when expression="#[vars.citizenship == &quot;Serbia&quot; and lower(vars.symptoms)=='no']">
+				<db:insert doc:name="Insert into isolation" doc:id="31298aed-d7c5-42a9-905a-40b45b502b74" config-ref="Database_Config">
+					<db:sql><![CDATA[INSERT INTO covid.person_in_isolation(id, name, surname, citizenship, statefrom, symptoms, isolation_status, left_days)
+VALUES (:id, :name, :surname, :citizenship, :statefrom, :symptoms, :isolation_status, :left_days)]]></db:sql>
+					<db:input-parameters><![CDATA[#[{	'id': payload.id,
+	'name': payload.name,
+	'surname': payload.surname,
+	'citizenship': payload.citizenship,
+	'statefrom': payload.statefrom,
+	'symptoms': payload.symptoms,
+	'isolation_status': '14',
+	'left_days' : '14'
+}]]]></db:input-parameters>
+				</db:insert>
+				<db:select doc:name="Select" doc:id="1b39806c-a575-44b3-8a92-f2841d0daf7e" config-ref="Database_Config">
+						<db:sql><![CDATA[select name from covid.country]]></db:sql>
+					</db:select>
+				<set-variable value="#[payload.name]" doc:name="country" doc:id="22fdd4b5-8a37-40de-a58e-75c66c2ad06e" variableName="country"/>
+				<foreach doc:name="For Each" doc:id="5ac16ee2-f869-4db4-b568-bef57137fdce" collection="#[vars.country]">
+					<choice doc:name="Choice" doc:id="76ec32df-dd72-4301-880e-85d5a0e8f587" >
+						<when expression="#[vars.statefrom==payload]">
+							<db:update doc:name="Update isolation table" doc:id="0e04c07c-f929-4e90-b335-4896abb1aedf" config-ref="Database_Config">
+								<db:sql><![CDATA[update covid.person_in_isolation set isolation_status= 28, left_days=28 where id= :id]]></db:sql>
+					<db:input-parameters><![CDATA[#[{
+	'id' : vars.id
+}]]]></db:input-parameters>
+						</db:update>
+						</when>
+					</choice>
+				</foreach>
+				<db:select doc:name="Select" doc:id="db8af17a-cb1d-4875-b181-a30e0488f53b" config-ref="Database_Config">
+								<db:sql><![CDATA[select isolation_status status from covid.person_in_isolation where id = :id]]></db:sql>
+								<db:input-parameters><![CDATA[#[{
+	'id' : vars.id
+}]]]></db:input-parameters>
+							</db:select>
+				<set-variable doc:name="isolation_type" doc:id="f05650c4-f3ed-458c-bda9-d49b07a03a0a" variableName="isolation_type" value="#[payload[0].status]" />
+				<set-payload value="#['Person is in isolation for ' ++ vars.isolation_type ++ ' days']" doc:name="In_isolation" doc:id="1b32bf78-fb55-4643-9712-b97d1115fcc0" />
+			</when>
+			<otherwise>
+				<set-variable value="400" doc:name="httpStatus" doc:id="869934a9-10e2-4223-bd45-d43699e598cb" variableName="httpStatus"/>
+				<raise-error doc:name="Raise error" doc:id="4a6fefc7-28f5-4bac-938d-4bdeb868cb18" description="'Forbidden entry. The person does not have Serbian citizenship.'" type="CUSTOM:CUSTOM_ERROR"/>
+			</otherwise>
+		</choice>
+	</flow>
+	<flow name="left_days" doc:id="49d3aa7f-500f-4783-ad18-446f52b54fb9" >
+		<scheduler doc:name="Scheduler" doc:id="b00f7399-1f93-4832-a740-33a01b35cb02" >
+			<scheduling-strategy >
+				<fixed-frequency frequency="1" startDelay="1" timeUnit="DAYS"/>
+			</scheduling-strategy>
+		</scheduler>
+		<db:update doc:name="Update left_days" doc:id="6cda1c98-9997-451d-ac8a-74262c28d742" config-ref="Database_Config">
+			<db:sql ><![CDATA[update covid.person_in_isolation set left_days=left_days-1]]></db:sql>
+		</db:update>
+		<db:insert doc:name="Insert into history" doc:id="f41934e3-c94c-4a2a-8876-0d8fe617054e" config-ref="Database_Config">
+			<db:sql><![CDATA[insert into covid.history (id, name, surname, citizenship, statefrom, symptoms)
+(select id, name, surname, citizenship, statefrom, symptoms from covid.person_in_isolation where left_days=0 )]]></db:sql>
+		</db:insert>
+		<db:delete doc:name="Delete person from person_in_isolation" doc:id="08da0638-55da-458f-b2eb-c995df816b75" config-ref="Database_Config">
+			<db:sql ><![CDATA[delete from covid.person_in_isolation where left_days=0]]></db:sql>
+		</db:delete>
+	</flow>
+	<flow name="sendEmail" doc:id="d135ad6a-e6e4-423f-802d-575c3b021666" >
+		<scheduler doc:name="Scheduler" doc:id="beed9683-c9ec-4016-9b8d-b512ece12273" >
+			<scheduling-strategy >
+				<cron expression="0 45 14 ? * *" timeZone="Europe/Belgrade" />
+			</scheduling-strategy>
+		</scheduler>
+		<db:select doc:name="Select in isolation" doc:id="c27ed7b4-fd53-483b-9b9d-f834ec3d2e37" config-ref="Database_Config">
+			<db:sql ><![CDATA[select count(*) in_isolation from covid.person_in_isolation]]></db:sql>
+		</db:select>
+		<set-variable value="#[payload.in_isolation]" doc:name="in_isolation" doc:id="ee0bd04b-c244-4ec0-a9c4-fb7a3bd6b94b" variableName="in_isolation"/>
+		<db:select doc:name="Out of isolation" doc:id="631b7b2b-1e6c-4ad7-ad8b-ed60d1e79206" config-ref="Database_Config">
+			<db:sql ><![CDATA[select count(*) out_of_isolation from covid.history]]></db:sql>
+		</db:select>
+		<set-variable value="#[payload.out_of_isolation]" doc:name="out_of_islolation" doc:id="7c2557e9-aa4e-4f7a-abfe-088805088bd3" variableName="out_of_islolation"/>
+		<db:select doc:name="with_symptoms" doc:id="2c13466c-55a3-4e6e-ace0-718aeaac3d07" config-ref="Database_Config">
+			<db:sql ><![CDATA[select count(*) with_symptoms from covid.person_in_hospital]]></db:sql>
+		</db:select>
+		<set-variable value="#[payload.with_symptoms]" doc:name="with_symptoms" doc:id="921f50db-9280-49ab-a0ed-80ed59c69652" variableName="with_symptoms"/>
+		<db:select doc:name="number_of_hospital" doc:id="c23fbc24-6041-4960-870d-cc9bd0fd62b1" config-ref="Database_Config">
+			<db:sql ><![CDATA[select count(*) number_of_hospital from covid.hospital]]></db:sql>
+		</db:select>
+		<set-variable value="#[payload.number_of_hospital]" doc:name="number_of_hospital" doc:id="bf484d30-30b7-4011-b17a-24110888f394" variableName="number_of_hospital"/>
+		<parse-template doc:name="Parse Template" doc:id="4f81798c-2e0d-4d7c-8388-da9117a292de" >
+			<content >&lt;html&gt;
+  &lt;body&gt;
+    &lt;table&gt;
+      &lt;thead&gt;
+        &lt;tr&gt;
+          &lt;th&gt;In isolation: &lt;/th&gt;
+          &lt;th&gt;Out of isolation&lt;/th&gt;
+          &lt;th&gt;With symptoms&lt;/th&gt;
+          &lt;th&gt;Total number of hospitals&lt;/th&gt;
+        &lt;/tr&gt;
+      &lt;/thead&gt;
+      &lt;tbody&gt;
+        &lt;tr&gt;
+          &lt;td&gt;vars.in_isolation&lt;/td&gt;
+          &lt;td&gt;vars.out_of_islolation&lt;/td&gt;
+          &lt;td&gt;vars.with_symptoms&lt;/td&gt;
+          &lt;td&gt;vars.number_of_hospital&lt;/td&gt;
+        &lt;/tr&gt;
+      &lt;/tbody&gt;
+    &lt;/table&gt;
+  &lt;/body&gt;
+&lt;/html&gt;</content>
+		</parse-template>
+		<email:send doc:name="Send" doc:id="890babf5-67aa-413e-ac1e-69551c1268e4" config-ref="Email_SMTPS" fromAddress="dajana.antanasijevic@devoteam.com" subject="IMPORTANT!">
+			<email:to-addresses >
+				<email:to-address value="dajana1493@gmail.com" />
+			</email:to-addresses>
+			<email:body contentType="text/html">
+				<email:content ><![CDATA[#[{
+	"In isolation": vars.in_isolation,
+	"Out of isolation": vars.out_of_islolation,
+	"With symptoms": vars.with_symptoms,
+	"Total number of hospitals": vars.number_of_hospital
+	}]]]></email:content>
+			</email:body>
+		</email:send>
+	</flow>
+</mule>

@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:munit="http://www.mulesoft.org/schema/mule/munit" xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xsi:schemaLocation="
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
+	<munit:config name="interface-suite.xml" />
+	<munit:test name="delete:\entrance\(id):corona-config-test" doc:id="52d22218-a400-45a8-8ce5-c8fd22015ccc" >
+		<munit:behavior >
+			<munit:set-event doc:name="Set Input" doc:id="6e6e4b02-e2d0-45dd-b326-b87b83cb55e3" >
+				<munit:payload value="#[readUrl('classpath://deleteentranceidcoronaconfigtest\set-event_payload.dwl')]" encoding="UTF-8" />
+				<munit:attributes value="#[readUrl('classpath://deleteentranceidcoronaconfigtest\set-event_attributes.dwl')]" />
+				<munit:variables >
+					<munit:variable key="outboundHeaders" value="#[readUrl('classpath://deleteentranceidcoronaconfigtest\set-event_variable_.dwl')]" />
+				</munit:variables>
+			</munit:set-event>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to delete:\entrance\(id):corona-config" doc:id="763f15d9-69d8-4c05-a887-9fe367dea89d" name="delete:\entrance\(id):corona-config"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert doc:name="Assert payload" doc:id="ed2f4d32-779c-4001-9dfe-28e9c93fa721" message="The payload does not match">
+				<munit-tools:that ><![CDATA[#[%dw 2.0
+import deleteentranceidcoronaconfigtest::assert_expression_payload
+---
+assert_expression_payload::main({payload: payload, attributes: attributes, vars: vars})]]]></munit-tools:that>
+			</munit-tools:assert>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="get:\email-daily-report:corona-config-test" doc:id="f5f21d4b-6b06-41a2-96ca-64f24aa696f4" >
+		<munit:behavior >
+			<munit:set-event doc:name="Set Input" doc:id="b1935fce-d074-4321-8a21-ad73c9ed7834" >
+				<munit:payload value="#[readUrl('classpath://getemaildailyreportcoronaconfigtest\set-event_payload.dwl')]" encoding="UTF-8" />
+				<munit:attributes value="#[readUrl('classpath://getemaildailyreportcoronaconfigtest\set-event_attributes.dwl')]" />
+				<munit:variables >
+					<munit:variable key="outboundHeaders" value="#[readUrl('classpath://getemaildailyreportcoronaconfigtest\set-event_variable_.dwl')]" />
+				</munit:variables>
+			</munit:set-event>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to get:\email-daily-report:corona-config" doc:id="e1413873-e3ee-42d7-a894-a5f8ace38fad" name="get:\email-daily-report:corona-config"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert doc:name="Assert payload" doc:id="efc2579f-d4b3-42bf-917a-ca8ecccd1675" message="The payload does not match">
+				<munit-tools:that ><![CDATA[#[%dw 2.0
+import getemaildailyreportcoronaconfigtest::assert_expression_payload
+---
+assert_expression_payload::main({payload: payload, attributes: attributes, vars: vars})]]]></munit-tools:that>
+			</munit-tools:assert>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="get:\entrance\(id):corona-config-test" doc:id="2d3bfb3b-a006-4ccc-868c-4135c1e3c76e" >
+		<munit:behavior >
+			<munit:set-event doc:name="Set Input" doc:id="b575c3a7-47cb-4169-9663-5ef89fa0518e" >
+				<munit:payload value="#[readUrl('classpath://getentranceidcoronaconfigtest\set-event_payload.dwl')]" encoding="UTF-8" />
+				<munit:attributes value="#[readUrl('classpath://getentranceidcoronaconfigtest\set-event_attributes.dwl')]" />
+				<munit:variables >
+					<munit:variable key="outboundHeaders" value="#[readUrl('classpath://getentranceidcoronaconfigtest\set-event_variable_.dwl')]" />
+				</munit:variables>
+			</munit:set-event>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to get:\entrance\(id):corona-config" doc:id="eea8dd86-269d-418b-84f4-ec21f9172194" name="get:\entrance\(id):corona-config"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert doc:name="Assert payload" doc:id="e7fa4146-90bd-45e4-9f33-1df347e955e6" message="The payload does not match">
+				<munit-tools:that ><![CDATA[#[%dw 2.0
+import getentranceidcoronaconfigtest::assert_expression_payload
+---
+assert_expression_payload::main({payload: payload, attributes: attributes, vars: vars})]]]></munit-tools:that>
+			</munit-tools:assert>
+		</munit:validation>
+	</munit:test>
+
+
+</mule>

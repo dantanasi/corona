@@ -1,0 +1,105 @@
+#%RAML 1.0
+title: CORONA
+
+types:
+  Person: !include datatypes/Person.raml
+  Simptoms: !include datatypes/Simptoms.raml
+
+/entrance:
+  post:
+    body:
+      application/json:
+        example: !include examples/Person.raml
+    responses:
+      200:
+        body:
+          application/json:
+            example:
+              message: "Welcome to Serbia"
+      400:
+        body:
+          application/json:
+            example:
+              message: "User with this id alredy exist"
+      403:
+        body:
+          application/json:
+            example:
+              message: "You do not have Serbian citizenship"
+      404:
+        body:
+          application/json:
+            example:
+              message: "Data source is empty"
+  get:
+    queryParameters:
+      isolation_type:
+        required: true
+        type: string
+    responses:
+      200:
+        description: Persons in isolation
+        body:
+          application/json:
+            examples: !include examples/Persons.raml
+      404:
+        description: No persons found in isolation
+        body:
+          application/json:
+            example:
+              message: "No persons found in isolation"
+
+  /{id}:
+    get:
+      responses:
+        200:
+          description: Information about person isolation status
+          body:
+            application/json:
+              examples: !include examples/Person.raml
+        404:
+          description: Person not found or invalid ID
+          body:
+            application/json:
+               example: 
+                   message: "Person not found"
+                   errorCode: 404
+
+    delete:
+      responses:
+        200:
+          description: Delete person from isolation
+          body:
+             application/json:
+              example:
+                message: "Person successfully deleted"
+        404:
+          description: Person not found or invalid ID
+          body:
+             application/json:
+              example:
+                message: "Person is not found"
+/email-daily-report:
+  get:
+    description: Get daily report and send email to the user
+    responses:
+      200:
+        description: Email sent successfully
+        body:
+          application/json:
+            example: 
+                message: "Email sent successfully"
+      500:
+        description: Failed to send email
+        body:
+          application/json:
+            example: 
+                error: "Failed to send email"
+    
+
+        
+    
+        
+
+    
+          

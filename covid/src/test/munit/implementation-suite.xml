@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:munit="http://www.mulesoft.org/schema/mule/munit" xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xsi:schemaLocation="
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
+	<munit:config name="implementation-suite.xml" />
+	<munit:test name="getPersonByType-test1" doc:id="1528c745-45f6-4dec-9c12-550a6d3153f9" >
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock Select by type" doc:id="0880c24a-9fec-4087-91ad-acf6bcfb7756" processor="db:select">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="d136fa2d-07fb-4a3d-a72b-3340cb1f94cb" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[output application/java  --- readUrl('classpath://getPersonByTypetest1\mock_payload.dwl')]" mediaType="application/java " encoding="UTF-8" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:spy doc:name="Spy isolation_type" doc:id="cb67cf5f-02cd-4f52-96ca-1a5d24e8d4dd" processor="set-variable">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="082e9674-0cd6-4e4b-ba18-686a116ccd34" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:after-call >
+					<munit-tools:assert doc:name="Assert payload" doc:id="90c51cbc-4131-4ac8-b909-d7930ce97f5c" message="The payload does not match">
+						<munit-tools:that ><![CDATA[#[%dw 2.0
+import getPersonByTypetest1::spy_assert_payload
+---
+spy_assert_payload::main({payload: payload, attributes: attributes, vars: vars})]]]></munit-tools:that>
+					</munit-tools:assert>
+				</munit-tools:after-call>
+			</munit-tools:spy>
+			<munit:set-event doc:name="Set Input" doc:id="786f8243-8495-49b9-9854-ea531cc4d626" >
+				<munit:payload value="#[readUrl('classpath://getPersonByTypetest1\set-event_payload.dwl')]" encoding="UTF-8" />
+				<munit:attributes value="#[readUrl('classpath://getPersonByTypetest1\set-event_attributes.dwl')]" />
+				<munit:variables >
+					<munit:variable key="outboundHeaders" value="#[readUrl('classpath://getPersonByTypetest1\set-event_variable_.dwl')]" />
+				</munit:variables>
+			</munit:set-event>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to getPersonByType" doc:id="07747aa8-44a9-440b-b3ac-4dbcaba9921b" name="getPersonByType"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert doc:name="Assert payload" doc:id="f1383188-f090-4c2e-ab5b-cafb8f680ddb" message="The payload does not match">
+				<munit-tools:that ><![CDATA[#[%dw 2.0
+import getPersonByTypetest1::assert_expression_payload
+---
+assert_expression_payload::main({payload: payload, attributes: attributes, vars: vars})]]]></munit-tools:that>
+			</munit-tools:assert>
+			<munit-tools:verify-call doc:name="Verify isolation_type" doc:id="2077ba35-aa40-4a52-8d4d-269e9eb85edf" processor="set-variable" times="1">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="082e9674-0cd6-4e4b-ba18-686a116ccd34" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+			</munit-tools:verify-call>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="getPersonByType-test2" doc:id="09dffd5a-0301-452f-a256-c2acf99f2985" >
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock Select by type" doc:id="de5737d9-d2a3-449d-b133-8f70a66a575f" processor="db:select">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="d136fa2d-07fb-4a3d-a72b-3340cb1f94cb" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[output application/java  --- readUrl('classpath://getPersonByTypetest2\mock_payload.dwl')]" mediaType="application/java " encoding="UTF-8" />
+					<munit-tools:variables >
+						<munit-tools:variable key="outboundHeaders" value="#[readUrl('classpath://getPersonByTypetest2\mock_variable_.dwl')]" />
+						<munit-tools:variable key="isolation_type" value="#[output application/java --- readUrl('classpath://getPersonByTypetest2\mock_variable_1.dwl')]" mediaType="application/java" encoding="UTF-8" />
+					</munit-tools:variables>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:spy doc:name="Spy isolation_type" doc:id="a9e7001b-2d42-4116-8c35-c944cb58cc0d" processor="set-variable">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="082e9674-0cd6-4e4b-ba18-686a116ccd34" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:before-call >
+					<munit-tools:assert doc:name="Assert attributes" doc:id="5caba9cf-5151-47bb-a779-faf28fff78f2" message="The attributes do not match">
+						<munit-tools:that ><![CDATA[#[%dw 2.0
+import getPersonByTypetest2::spy_assert_attributes
+---
+spy_assert_attributes::main({payload: payload, attributes: attributes, vars: vars})]]]></munit-tools:that>
+					</munit-tools:assert>
+				</munit-tools:before-call>
+				<munit-tools:after-call >
+					<munit-tools:assert doc:name="Assert payload" doc:id="13368be0-484d-4d37-af93-87dbc0c2309d" message="The payload does not match">
+						<munit-tools:that ><![CDATA[#[%dw 2.0
+import getPersonByTypetest2::spy_assert_payload
+---
+spy_assert_payload::main({payload: payload, attributes: attributes, vars: vars})]]]></munit-tools:that>
+					</munit-tools:assert>
+				</munit-tools:after-call>
+			</munit-tools:spy>
+			<munit-tools:spy doc:name="Spy Transform Message" doc:id="3b143b6e-3deb-470c-bb48-fc97c86c96e9" processor="ee:transform">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="72716992-56b5-4b61-922e-1097b463cd90" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:before-call >
+					<munit-tools:assert doc:name="Assert payload" doc:id="12e4c185-1bb7-4228-9b06-64dfc97aeefb" message="The payload does not match">
+						<munit-tools:that ><![CDATA[#[%dw 2.0
+import getPersonByTypetest2::spy_assert_payload1
+---
+spy_assert_payload1::main({payload: payload, attributes: attributes, vars: vars})]]]></munit-tools:that>
+					</munit-tools:assert>
+				</munit-tools:before-call>
+				<munit-tools:after-call >
+					<munit-tools:assert doc:name="Assert payload" doc:id="7dd24015-f639-4f69-8c60-f1095abd1170" message="The payload does not match">
+						<munit-tools:that ><![CDATA[#[%dw 2.0
+import getPersonByTypetest2::spy_assert_payload2
+---
+spy_assert_payload2::main({payload: payload, attributes: attributes, vars: vars})]]]></munit-tools:that>
+					</munit-tools:assert>
+				</munit-tools:after-call>
+			</munit-tools:spy>
+			<munit:set-event doc:name="Set Input" doc:id="f744a33f-2c23-461c-9b0d-32ad0cba84e6" >
+				<munit:payload value="#[readUrl('classpath://getPersonByTypetest2\set-event_payload.dwl')]" encoding="UTF-8" />
+				<munit:attributes value="#[readUrl('classpath://getPersonByTypetest2\set-event_attributes.dwl')]" />
+				<munit:variables >
+					<munit:variable key="outboundHeaders" value="#[readUrl('classpath://getPersonByTypetest2\set-event_variable_.dwl')]" />
+				</munit:variables>
+			</munit:set-event>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to getPersonByType" doc:id="37202cd6-3911-438a-8e83-53fcbb24e1c4" name="getPersonByType"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert doc:name="Assert payload" doc:id="41d89b2d-e27d-4f34-bc24-95796c9efc42" message="The payload does not match">
+				<munit-tools:that ><![CDATA[#[%dw 2.0
+import getPersonByTypetest2::assert_expression_payload
+---
+assert_expression_payload::main({payload: payload, attributes: attributes, vars: vars})]]]></munit-tools:that>
+			</munit-tools:assert>
+			<munit-tools:verify-call doc:name="Verify isolation_type" doc:id="4bb83ca9-7dbf-44ff-9322-51dda35ad97d" processor="set-variable" times="1">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="082e9674-0cd6-4e4b-ba18-686a116ccd34" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+			</munit-tools:verify-call>
+			<munit-tools:verify-call doc:name="Verify Transform Message" doc:id="5b846af2-4d73-439d-911a-309c3e5dceed" processor="ee:transform" times="1">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="72716992-56b5-4b61-922e-1097b463cd90" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+			</munit-tools:verify-call>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="getPersonByID-test" doc:id="f53d4b4a-930a-40ea-8a59-9365dc23e5ea" >
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock Select" doc:id="8f994d29-5274-458a-be11-8e5b385ed6ba" processor="db:select">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="9d3f5f4f-de14-494a-a257-6ddeb1f59f4b" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[output application/java  --- readUrl('classpath://getPersonByIDtest\mock_payload.dwl')]" mediaType="application/java " encoding="UTF-8" />
+					<munit-tools:variables >
+						<munit-tools:variable key="outboundHeaders" value="#[readUrl('classpath://getPersonByIDtest\mock_variable_.dwl')]" />
+						<munit-tools:variable key="id" value="#[output application/java --- readUrl('classpath://getPersonByIDtest\mock_variable_1.dwl')]" mediaType="application/java" encoding="UTF-8" />
+					</munit-tools:variables>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:spy doc:name="Spy id" doc:id="131450cc-f71e-4c9e-858d-211d2e5bcfab" processor="set-variable">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="e528ac3c-a5db-4784-9a81-65395883e6d9" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:before-call >
+					<munit-tools:assert doc:name="Assert attributes" doc:id="1fe584f6-607c-490e-9c94-3ee9dffba43a" message="The attributes do not match">
+						<munit-tools:that ><![CDATA[#[%dw 2.0
+import getPersonByIDtest::spy_assert_attributes
+---
+spy_assert_attributes::main({payload: payload, attributes: attributes, vars: vars})]]]></munit-tools:that>
+					</munit-tools:assert>
+				</munit-tools:before-call>
+				<munit-tools:after-call >
+					<munit-tools:assert doc:name="Assert payload" doc:id="2d701104-44b6-48e1-ba6a-26e45a4226d8" message="The payload does not match">
+						<munit-tools:that ><![CDATA[#[%dw 2.0
+import getPersonByIDtest::spy_assert_payload
+---
+spy_assert_payload::main({payload: payload, attributes: attributes, vars: vars})]]]></munit-tools:that>
+					</munit-tools:assert>
+				</munit-tools:after-call>
+			</munit-tools:spy>
+			<munit:set-event doc:name="Set Input" doc:id="a4bd56be-58ec-480b-bdd6-bcf3b82acd78" >
+				<munit:payload value="#[readUrl('classpath://getPersonByIDtest\set-event_payload.dwl')]" encoding="UTF-8" />
+				<munit:attributes value="#[readUrl('classpath://getPersonByIDtest\set-event_attributes.dwl')]" />
+				<munit:variables >
+					<munit:variable key="outboundHeaders" value="#[readUrl('classpath://getPersonByIDtest\set-event_variable_.dwl')]" />
+				</munit:variables>
+			</munit:set-event>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to getPersonByID" doc:id="5b508055-9231-4dac-a571-73f25e77a575" name="getPersonByID"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert doc:name="Assert payload" doc:id="df829669-2487-4acd-b5e1-b45597e5d79f" message="The payload does not match">
+				<munit-tools:that ><![CDATA[#[%dw 2.0
+import getPersonByIDtest::assert_expression_payload
+---
+assert_expression_payload::main({payload: payload, attributes: attributes, vars: vars})]]]></munit-tools:that>
+			</munit-tools:assert>
+			<munit-tools:verify-call doc:name="Verify id" doc:id="c2b0df5a-af2d-4ff3-a11d-6d2fb5b1dd55" processor="set-variable" times="1">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="e528ac3c-a5db-4784-9a81-65395883e6d9" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+			</munit-tools:verify-call>
+		</munit:validation>
+	</munit:test>
+
+
+</mule>
